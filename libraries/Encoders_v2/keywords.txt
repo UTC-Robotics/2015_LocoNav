@@ -1,0 +1,14 @@
+Encoders_v2	KEYWORD1
+encoders_init	KEYWORD2
+getEncLmasterCount	KEYWORD2
+getEncRmasterCount	KEYWORD2
+getEncLtripCount	KEYWORD2
+getEncRtripCount	KEYWORD2
+resetEncLtripCount	KEYWORD2
+resetEncRtripCount	KEYWORD2
+getEncCPR	KEYWORD2
+getEncL_ChApin	KEYWORD2
+getEncR_ChApin	KEYWORD2
+getEncL_ChBpin	KEYWORD2
+getEncR_ChBpin	KEYWORD2
+
