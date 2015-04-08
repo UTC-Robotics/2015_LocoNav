@@ -94,7 +94,6 @@ void loop() {
       delay(100);
     }
     digitalWrite(39,LOW);
-
     Serial.println("UP AGAIN");
     //LiftMotor(1.4);
     LiftMotor(1.9);
