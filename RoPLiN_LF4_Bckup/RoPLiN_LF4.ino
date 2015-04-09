@@ -57,8 +57,6 @@ void setup() {
   shield.setM2Speed(0);
   // Initialize the encoders
   encoders_init();
-  pinMode(39,OUTPUT);
-  pinMode(41,INPUT);
   // Setup the debugging Serial communication channel
   Serial.begin(9600);
   Serial2.begin(115200);
@@ -69,6 +67,8 @@ void loop() {
   
   //
  /* 
+  pinMode(39,OUTPUT);
+  pinMode(41,INPUT);
   while(true)
   {
     Serial.println("DOWN AGAIN");
@@ -94,7 +94,6 @@ void loop() {
       delay(100);
     }
     digitalWrite(39,LOW);
-
     Serial.println("UP AGAIN");
     //LiftMotor(1.4);
     LiftMotor(1.9);
@@ -105,7 +104,7 @@ void loop() {
   
   
   
-  
+  /*
   bool* FLF;
   while(true)
   {
@@ -121,7 +120,7 @@ void loop() {
     free(FLF);
     delay(100);
   }
-  
+  */
   
   // Initialize the variables
   int endType=0; // The type of junction that was identified
@@ -131,18 +130,16 @@ void loop() {
   bool Priority=0;
 
   
-      //endType=FollowLine(1,-ROBOSPEED);
-      //Serial.println(endType);
+      endType=FollowLine(1,-ROBOSPEED);
+      Serial.println(endType);
       //Turn(0,1);
-      /*
       while(true)
       {
         delay(2000);
         Serial.println("DONE");
       }
-      */
   
-
+  
   while(GNum<4)
   {
     Priority=GNum%2;
@@ -157,24 +154,7 @@ void loop() {
       if(endType<2)
         Turn(direc,(bool)endType);
     }
-    // Turn onto the game b  ranch
-    if(GNum==0)
-    {
-      GNum++;
-      direc^=1;
-      if(endType==4-Priority)
-      {
-        Serial.println("J: Rolling");
-        //RollForwards(direc,6);
-      }
-      else
-      {
-        Serial.println("J: Turning");
-        Turn(direc,Priority);
-      }
-      endType=-10;
-      goto EndLoop;     
-    }
+    // Turn onto the game branch
     if(endType==4-Priority)
     {
       Serial.println("J: Rolling");
@@ -217,51 +197,22 @@ void loop() {
         Turn(direc,(bool)endType);
     }
     // Manage the main road junction
-    //int BackTime=500;
+    int BackTime=500;
     ReCheck:
     if(endType==5 && justCrossed==0)
     {
-     /*
+      /*
+      justCrossed=1;
+      GNum++;
+      Serial.println("J: 4Way Rolling");
+      //RollForwards(direc,6);
+      goto GameBranch;
+      */
       BackParallelPark(direc,-ROBOSPEED,BackTime);
       FollowLine(direc,-ROBOSPEED);
       BackTime+=250;
       goto ReCheck;
-      */
     }
-    if(endType==4-Priority)
-    {
-      Serial.println("J: Rolling");
-      //RollForwards(direc,6);
-    }
-    else
-    {
-      Serial.println("J: Turning");
-      Turn(direc,Priority);
-    }
-    endType=-10;
-    GNum++;
-    justCrossed=0;
-    EndLoop:
-    Serial.println("--------------------- NEXT GAME ---------------------");
-  }
-  
-  /*
-  while(GNum<4)
-  {
-    Priority=GNum%2;
-    Priority^=1;
-    //direc=0;
-    // Get to game branch
-    Serial.println("To: game branch");
-    while(endType<2)
-    {
-      endType=FollowLine(direc,-ROBOSPEED);
-      Serial.println(endType);
-      Serial2.println(endType);
-      if(endType<2)
-        Turn(direc,(bool)endType);
-    }
-    // Turn away from the game branch
     if(endType==4-Priority)
     {
       Serial.println("J: Rolling");
@@ -277,18 +228,6 @@ void loop() {
     justCrossed=0;
     Serial.println("--------------------- NEXT GAME ---------------------");
   }
-  // Travel down the victory stretch of the main road
-  Serial.println("To: Finish line");
-  while(endType<2)
-  {
-    endType=FollowLine(direc,-ROBOSPEED);
-    Serial.println(endType);
-    Serial2.println(endType);
-    if(endType<2)
-      Turn(direc,(bool)endType);
-  }
-  */
-  
   // Travel down the victory stretch of the main road
   Serial.println("To: Finish line");
   while(endType<2)
@@ -309,7 +248,7 @@ void loop() {
   }
 }
 
-// Function for docking robot with games
+// Dummy function for docking games : TO BE FILLED IN BY INTEGRATION
 void dockGame(bool direc, int Game)
 {
   int Amount=0;
@@ -317,16 +256,16 @@ void dockGame(bool direc, int Game)
   switch(Game)
   {
     case SIMON:
-    Amount=1300;
+    Amount=4;
     break;
     case ETCHA:
-    Amount=1300;
+    Amount=3;
     break;
     case RUBIK:
-    Amount=1300;
+    Amount=1;
     break;
     case CARDS:
-    Amount=1300;
+    Amount=7;
     break;
     default:
     case ENDGM:
@@ -337,7 +276,7 @@ void dockGame(bool direc, int Game)
     }
     break; 
   }
-  RollForwards(direc, Amount);
+  //RollForwards(direc, Amount);
   return;
 }
 
@@ -352,72 +291,38 @@ void playGame(int Game)
   // do a switch case to send the enable signal to the slave microcontrollers to play the games
   int pin=0;
   int TimeCap=0;
-  int Count=0;
   // do something like a switch case specifying the amount the bot should roll forwards
   switch(Game)
   {
     case SIMON:
     pin=14;
     TimeCap=2;
-    digitalWrite(pin,HIGH);
-    while(Count<TimeCap)
-    {
-      delay(1000);
-      Count++;
-    }
-    digitalWrite(pin,LOW);
     break;
-    
     case ETCHA:
-    Serial.println("Etch-A-Sketch DOWN");
-    LiftMotor(-1.9);
-    digitalWrite(39,LOW);
-    delay(1000);
-    digitalWrite(39,HIGH);
-    delay(1000);
-    digitalWrite(39,LOW);
-    delay(1000);   
-    Serial.println("Etch-A-Sketch SIGNALLED");
-    while(digitalRead(41)==0)
-    {
-      delay(100);
-    }
-    digitalWrite(39,LOW);
-    Serial.println("Etch-A-Sketch UP");
-    LiftMotor(1.9);
+    pin=15;
+    TimeCap=2;
     break;
     case RUBIK:
     pin=16;
     TimeCap=2;
-    Serial.println("Rubiks DOWN");
-    LiftMotor(-1.9);
-    digitalWrite(39,LOW);
-    delay(1000);
-    digitalWrite(39,HIGH);
-    delay(1000);
-    digitalWrite(39,LOW);
-    delay(1000);   
-    Serial.println("Rubiks SIGNALLED");
-    while(digitalRead(41)==0)
-    {
-      delay(100);
-    }
-    digitalWrite(39,LOW);
-    Serial.println("Rubiks UP");
-    LiftMotor(1.9);
     break;
     case CARDS:
     pin=17;
     TimeCap=2;
-    LiftMotor(-1.9);
-    delay(1000);
-    LiftMotor(1.9);
     break;
     default:
     case ENDGM:
     Serial.print("ERROR: Miscall to PlayGame function (not one of four main games)");
     break; 
   }
+  digitalWrite(pin,HIGH);
+  int Count=0;
+  while(Count<TimeCap)
+  {
+    delay(1000);
+    Count++;
+  }
+  digitalWrite(pin,LOW);
   return;
 }
 
@@ -533,7 +438,7 @@ void RollForwards(bool direc, int Amount)
   // Wait a bit to give the robot time to roll
   //delay(200*Amount);
   int dist=(int)((float)Amount/((3.141592*DWHEEL)/12000.0));
-  dist=Amount;
+  dist=Amount*450;
   int startRCount=getEncRCount();
   if(direc==0)
   {
@@ -972,8 +877,6 @@ int FollowLine(bool direc, int motorBase = -150)
   bool Fronto = 0;
   long DelTime=0;
   long LastMic=0;
-  
-  int startRCount=getEncRCount();
   // Keep on moving until the center LF has seen an anomaly and the middle LF is over an anomaly
   //KeepGoing:
   while(!(JunctionSighted==1))
@@ -1015,8 +918,7 @@ int FollowLine(bool direc, int motorBase = -150)
         Righto=1;
       } 
       // Flag that the front line follower has crossed a junction
-      JunctionSighted=1;
-      startRCount=getEncRCount(); 
+      JunctionSighted=1; 
       Serial.print("LF: Left/Right = ");
       Serial.print(Lefto);
       Serial.print("/");
@@ -1127,7 +1029,6 @@ int FollowLine(bool direc, int motorBase = -150)
     {
       deltaMotor=0;
       // Snapshot: Recognize whether this anomaly has left or right branches
-      /*
       if(FLF[0]==1 || FLF[1] == 1)
       {
         Lefto=1;
@@ -1136,7 +1037,6 @@ int FollowLine(bool direc, int motorBase = -150)
       {
         Righto=1;
       } 
-      */
       // Flag that the front line follower has crossed a junction
       JunctionSighted=1;    
       Serial.print("LF: Left/Right = ");
@@ -1183,7 +1083,8 @@ int FollowLine(bool direc, int motorBase = -150)
   
   //RollForwards(direc,6);
   //int dist=450*6;
-  int dist=1100;
+  int dist=450*2;
+  int startRCount=getEncRCount();
   shield.setM1Speed(motorBase);
   shield.setM2Speed(motorBase);
   if(direc==0)
@@ -1196,7 +1097,6 @@ int FollowLine(bool direc, int motorBase = -150)
         Serial.print((int)FLF[i]);
       }
       Serial.print(",");
-      /*
       if(FLF[0]==1 || FLF[1] == 1)
       {
         Lefto=1;
@@ -1205,7 +1105,6 @@ int FollowLine(bool direc, int motorBase = -150)
       {
         Righto=1;
       } 
-      */
       free(FLF);
       Serial.println(getEncRCount());
       delay(1);
@@ -1221,7 +1120,6 @@ int FollowLine(bool direc, int motorBase = -150)
         Serial.print((int)FLF[i]);
       }
       Serial.print(",");
-      /*
       if(FLF[0]==1 || FLF[1] == 1)
       {
         Lefto=1;
@@ -1230,7 +1128,6 @@ int FollowLine(bool direc, int motorBase = -150)
       {
         Righto=1;
       } 
-      */
       free(FLF);
       Serial.println(getEncRCount());
       delay(1);

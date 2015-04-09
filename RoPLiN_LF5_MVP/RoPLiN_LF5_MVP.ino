@@ -26,10 +26,10 @@
 int SimLFPins[8]={20,22,24,26,28,30,32,34};
 int MidLFPins[8]={21,23,25,27,29,31,33,35};
 int CarLFPins[8]={36,38,40,42,44,46,48,50};
-bool Directo=0;
-int  JunCo=0;
-int  RiCo=0;
-int  LeCo=0;
+volatile bool Directo=0;
+volatile int  JunCo=0;
+volatile int  RiCo=0;
+volatile int  LeCo=0;
 
 LineFollower MidLF(MidLFPins);
 LineFollower SimLF(SimLFPins);
@@ -64,7 +64,7 @@ void setup() {
   // Initialize the encoders
   encoders_init();
   // Setup the interrupts
-  Timer1.initialize(10000); // set a timer of length 100000 microseconds (or 0.1 sec - or 10Hz => the led will blink 5 times, 5 cycles of on-and-off, per second)
+  Timer1.initialize(2000000); // set a timer of length 100000 microseconds (or 0.1 sec - or 10Hz => the led will blink 5 times, 5 cycles of on-and-off, per second)
   Timer1.attachInterrupt( timerIsr ); // attach the service routine here
   // Setup the debugging Serial communication channel
   Serial.begin(9600);
@@ -75,6 +75,13 @@ void timerIsr()
 {
   bool* FLF;
   FLF=ReadFrontLF(Directo); 
+
+    for(int i=0;i<8;i++)
+    {
+      Serial.print((int)FLF[i]);
+    }
+    Serial.println("::");
+
   if(Anomalous(FLF,3))
   {
     /*
@@ -169,7 +176,7 @@ void loop() {
   bool justCrossed=0; // In case of 4-way junction
   bool Priority=0;
 
-  
+      Directo=1;
       endType=FollowLine(1,-ROBOSPEED);
       Serial.println(endType);
       //Turn(0,1);
@@ -178,7 +185,6 @@ void loop() {
         delay(2000);
         Serial.println("DONE");
       }
-  
   
   while(GNum<4)
   {
