@@ -1,0 +1,6 @@
+MEGAEncoders	KEYWORD1
+encoders_init	KEYWORD2
+getEncLCount	KEYWORD2
+getEncRCount	KEYWORD2
+resetEncLCount	KEYWORD2
+resetEncRCount	KEYWORD2

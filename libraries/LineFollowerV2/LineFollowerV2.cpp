@@ -5,7 +5,7 @@
 	Library for the Parallax Inc. Line Follower
 */
 
-LineFollower::LineFollower(int outPin[8], int enablePin)
+LineFollower::LineFollower(int outPin[8])
 {
 	// Initialize Pins, but into Low power mode
 	for(int index = 0; index < 8; index++)
@@ -13,19 +13,9 @@ LineFollower::LineFollower(int outPin[8], int enablePin)
 		_outPin[index] = outPin[index];
 		pinMode(_outPin[index], INPUT);
 	}
-	_enablePin = enablePin;
-	pinMode(_enablePin, OUTPUT);
-	digitalWrite(_enablePin, LOW);
-}
-
-void LineFollower::enable()
-{
-	digitalWrite(_enablePin, HIGH);
-}
-
-void LineFollower::disable()
-{
-	digitalWrite(_enablePin, LOW);
+	//_enablePin = enablePin;
+	//pinMode(_enablePin, OUTPUT);
+	//digitalWrite(_enablePin, LOW);
 }
 
 char LineFollower::measure()

@@ -1,0 +1,13 @@
+LocoNav2015_FuncLib	KEYWORD1
+FollowLine	KEYWORD2
+Parallelize	KEYWORD2
+BackParallelPark	KEYWORD2
+SetMotorsToRotate	KEYWORD2
+Anomalous	KEYWORD2
+FrontLine	KEYWORD2
+Turn	KEYWORD2
+JuggleBoolArray	KEYWORD2
+LiftMotor	KEYWORD2
+dockGame	KEYWORD2
+PlayGame	KEYWORD2
+undock	KEYWORD2
